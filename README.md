@@ -1,0 +1,1 @@
+To run this code locally you need to have Python, Django, the Django Rest Framework and Numpy installed on your machine. Once that is in place, the code runs like any other Django app, so it shouldn't be a problem for any developer to implement it and then modify it.
