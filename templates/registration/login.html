@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block header %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'prediction_markets/style.css' %}">
+{% endblock header %}
+
+
+{% block content %}
+<div class='login-wrapper'>
+    <div class='login-container'>
+        <div class='login-container-header'>
+            <div class="login-title">
+                Welcome to Prediction Markets
+            </div>
+        </div>
+        <div class='login-container-main'>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                {{ field.errors }}
+                <label for="{{ field.id_for_label }}" class="field-label">{{ field.label_tag }}</label>
+                <input type="{{ field.field.widget.input_type }}" name="{{ field.html_name }}" autofocus="" autocapitalize="none" autocomplete="{{ field.html_name }}" maxlength="150" required="" id="{{ field.id_for_label }}" class="field-input">
+            {% endfor %}
+            <button type="submit" class="login-btn">Log In</button>
+        </form>
+        </div>
+    </div>
+        {% for error in form.non_field_errors %}
+            <div class='error-box'>{{error}}</div>
+        {% endfor %}
+</div>
+{% endblock content %}

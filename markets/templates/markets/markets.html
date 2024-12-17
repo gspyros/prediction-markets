@@ -1,0 +1,282 @@
+{% extends "markets/ui_template.html" %}
+{% block markets %}
+      {% if markets %}  
+        {% for m in markets%}
+            <div id="{{ m.market.id }}_market" class="market">
+                <div class="market-header">
+                    <div class="market-header-title" title="{{ m.market.name }}">
+												<span class="market-header-title-text">
+													{{ m.market.name }}
+												</span>
+                    </div>
+                    <div class="market-header-right-half">
+                      <div class="market-header-schedule">
+                        <div class="market-header-schedule-item">
+                            <div class="market-header-schedule-item-label">
+                                Opening Date
+                            </div>
+                            <div class="market-header-schedule-item-content" id="{{ m.market.id }}_od">
+                                {{ m.market.opening_date }}
+                            </div>
+                        </div>
+                        <div class="market-header-schedule-item">
+                            <div class="market-header-schedule-item-label">
+                                Opening Time
+                            </div>
+                            <div class="market-header-schedule-item-content" id="{{ m.market.id }}_ot">
+                                {{ m.market.opening_time|time:"H:i" }}
+                            </div>
+                        </div>
+                        <div class="market-header-schedule-item">
+                            <div class="market-header-schedule-item-label">
+                                Closing Date
+                            </div>
+                            <div class="market-header-schedule-item-content" id="{{ m.market.id }}_cd">
+                                {{ m.market.closing_date }}
+                            </div>
+                        </div>
+                        <div class="market-header-schedule-item">
+                            <div class="market-header-schedule-item-label">
+                                Closing Time
+                            </div>
+                            <div class="market-header-schedule-item-content" id="{{ m.market.id }}_ct">
+                                {{ m.market.closing_time|time:"H:i" }}
+                            </div>
+                        </div>
+                      </div>
+                      {% if m.market.status == 'PENDING' %}
+                      <div class="market-header-cdown" id="{{ m.market.id}}_countdown">
+                        <div class="market-header-cdown-label" id="{{ m.market.id}}_countdown_label">
+                          Time To Open
+                        </div>
+                        <div class="market-header-cdown-timer" id="{{ m.market.id }}_countdown_val">
+                          DD:HH:MM:SS
+                        </div>
+                      </div>
+                      {% elif m.market.status == 'OPEN' %}
+                      <div class="market-header-cdown" id="{{ m.market.id}}_countdown">
+                        <div class="market-header-cdown-label" id="{{ m.market.id}}_countdown_label">
+                          Time To Close
+                        </div>
+                        <div class="market-header-cdown-timer" id="{{ m.market.id }}_countdown_val">
+                          --:--:--:--
+                        </div>
+                      </div>
+                      {% elif m.market.status == 'CLOSED' %}
+                      <div class="market-header-cdown-hide" id="{{ m.market.id}}_countdown">
+                        <div class="market-header-cdown-label" id="{{ m.market.id}}_countdown_label">
+                        </div>
+                        <div class="market-header-cdown-timer" id="{{ m.market.id }}_countdown_val">
+                        </div>
+                      </div>
+                      {% elif m.market.status == 'SETTLED' %}
+                      <div class="market-header-cdown-hide" id="{{ m.market.id}}_countdown">
+                        <div class="market-header-cdown-label" id="{{ m.market.id}}_countdown_label">
+                        </div>
+                        <div class="market-header-cdown-timer" id="{{ m.market.id }}_countdown_val">
+                        </div>
+                      </div>
+                      {% endif %}
+                      <button class="market-header-status market-header-status-{{ m.market.status|lower }}" id="{{ m.market.id }}_status">
+                        {{ m.market.status }}
+                      </button>
+                  </div>
+                </div>
+
+                {% if m.market.description|length > 0 %}
+                  <div class="market-details" id="{{ m.market.id }}_details">
+                    <div class="market-details-text">
+                      {{ m.market.description }}
+                    </div>
+                  </div>
+                  <div class="market-details-ribbon" onclick="toggleMarketDetails({{ m.market.id }})">
+                    <div class="market-details-button">
+                      <div class="label" id="{{ m.market.id }}_details_label">
+                        Show Details
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+                
+                <div class="market-section market-section-aum">
+    
+                    <div class="market-section-title">
+                      Financials
+                    </div>
+                
+                    <div class="market-section-content">
+                      <div class="market-data-item">
+                        <div class="market-data-item-label">
+                          Currency
+                        </div>
+                        <div class="market-data-item-value">
+                          {{ m.market.currency }}
+                        </div>
+                      </div>
+                    
+                      <div class="market-data-item">
+                        <div class="market-data-item-label">
+                          Starting Funds
+                        </div>
+                        <div class="market-data-item-value"  id="{{ m.market.id }}_sf">
+                          {{ m.market.starting_funds|floatformat:2 }}
+                        </div>
+                      </div>
+                    
+                      <div class="market-data-item">
+                        <div class="market-data-item-label">
+                          Available Funds
+                        </div>
+                        <div class="market-data-item-value"  id="{{ m.market.id }}_af" name="{{ m.market.id }}_af">
+                          {{ m.avail_funds|floatformat:2 }}
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="market-section market-section-trades">
+                    <div class="market-section-title">
+                      Trading Data
+                    </div>
+                    <div class='market-section-content'>
+                      <div class="market-data-item">
+                        <div class="market-data-item-label">
+                          Exec Market Trades
+                        </div>
+                        <div class="market-data-item-value" id="{{ m.market.id }}_trades">
+                          {{ m.n_market_trades_executed }}
+                        </div>
+                      </div>
+                      <div class="market-data-item">
+                        <div class="market-data-item-label">
+                          My Exec Trades
+                        </div>
+                        <div class="market-data-item-value" id="{{ m.market.id }}_user_trades">
+                          {{ m.n_user_trades_executed }}
+                        </div>
+                      </div>
+                      <button class="table-button book-button" onclick="showTrades({{ m.market.id }})" name="{{ market.m.id }}_btn">Trading Book</button>
+                    </div>
+                </div>
+                <div class="market-payouts">
+                  <div class="market-section-title" id="{{ m.market.id }}_payout_title">
+                    {% if m.market.status == 'SETTLED' %}
+                      Payout
+                    {% else %}
+                      Projected Payout
+                    {% endif %}
+                    </div>
+                    <table>
+                        <tr>
+                            <th>Outcome</th>
+                            <th>Shares</th>
+                            <th>Cash</th>
+                            <th>Payout</th>
+                            <th>Result</th>
+                        </tr>
+                        {% for i in m.instruments %}
+                          {% if i.outcome_status == 'Won' %}
+                          <tr name="{{ m.market.id }}_payout_row" id="{{ i.instrument.id }}_payout_row" class="won-row">
+                          {% elif i.outcome_status == 'Lost' %}
+                          <tr name="{{ m.market.id }}_payout_row" id="{{ i.instrument.id }}_payout_row" class="lost-row">
+                          {% else %}
+                          <tr name="{{ m.market.id }}_payout_row" id="{{ i.instrument.id }}_payout_row">
+                          {% endif %}
+                            <td>{{ i.instrument.name }}</td>
+                            <td id="{{ i.instrument.id }}_pos_payout" {{ i.instrument.name }}_pos>{{ i.position.size|floatformat:0 }}</td>
+                            <td id="{{ i.instrument.id }}_cash_payout" name="{{ m.market.id }}_af">{{ m.avail_funds|floatformat:2 }}</td>
+                            <td id="{{ i.instrument.id }}_payout">{{ i.projected_return|floatformat:2 }}</td>
+                            <td id="{{ i.instrument.id }}_payout_result">{{ i.outcome_status }}</td>
+                          </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="market-pos" id="{{ m.market.id }}_positions">
+                    <div class="market-section-title">
+                      Portfolio
+                    </div>
+                    <table>
+                        <tr>
+                            <th>Asset</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                        {% for i in m.instruments %}
+                        <tr name="position_row">
+                            <td>{{ i.instrument.name }}</td>
+                            <td id="{{ i.instrument.id }}_price" {{ i.instrument.name }}_price name="price">{{ i.instrument.price|floatformat:2  }}</td>
+                            <td id="{{ i.instrument.id }}_pos" {{ i.instrument.name }}_pos name="position">{{ i.position.size|floatformat:0 }}</td>
+                            <td>
+                                {% if m.market.status == 'OPEN' %}
+                                  <button class="table-button table-button-buy" onclick="trade('{{m.market.id}}', '{{i.instrument.id}}','BUY')" name="BUY" type="trade_button" id="{{ i.instrument.id }}_BUY">Buy</button>
+                                  {% if i.position.size > 0 %}
+                                    <button class="table-button table-button-sell" onclick="trade('{{m.market.id}}', '{{i.instrument.id}}', 'SELL')" name="SELL" type="trade_button" id="{{ i.instrument.id }}_SELL">Sell</button>
+                                  {% else %}
+                                    <button class="table-button table-button-inactive" onclick="trade('{{m.market.id}}', '{{i.instrument.id}}', 'SELL')" name="SELL" type="trade_button" id="{{ i.instrument.id }}_SELL">Sell</button>
+                                  {% endif %}
+                                {% else %}
+                                  <button class="table-button table-button-inactive" onclick="trade('{{m.market.id}}', '{{i.instrument.id}}','BUY')" name="BUY" type="trade_button" id="{{ i.instrument.id }}_BUY">Buy</button>
+                                  <button class="table-button table-button-inactive" onclick="trade('{{m.market.id}}', '{{i.instrument.id}}', 'SELL')" name="SELL" type="trade_button" id="{{ i.instrument.id }}_SELL">Sell</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                  </div> 
+                <div class="market-chart">
+                    <div id="chart_div_{{ m.market.id}}"></div>
+                </div>
+            </div>
+            <div class="trades_modal" id="{{ m.market.id }}_trading_book">
+                <div class='modal-title'>
+                  {{m.market.name}}
+                </div>
+                  <table class="trades-table">
+                    <thead>
+                    <tr>
+                      <th scope="col">Asset</th>
+                      <th scope="col">Action</th>
+                      <th scope="col">Qty</th>
+                      <th scope="col">Price</th>
+                      <th scope="col">DateTime</th>
+                      <th scope="col">Status</th>
+                    </tr>
+                  </thead>
+                    <tbody class="trades-table-body" id="trades_table_{{ m.market.id }}">
+                  {% for t in m.user_trades %}
+                    <tr><td>{{ t.instrument.name }}</td><td>{{ t.type }}</td><td>{{ t.shares }}</td><td>{{ t.price|floatformat:2 }}</td><td>{{ t.timestamp }}</td><td>{{ t.status }}</td></tr>
+                  {% endfor %}
+                    </tbody>
+                  </table>
+                <button class="table-button sell-button" onclick="hideTrades({{m.market.id}})">Close Trading Book</button>
+            </div>
+             <div class="info_modal" id="{{ m.market.id }}_info">
+                <div class='modal-title'>
+                  Market Details
+                </div>
+                <h3>Market Name</h3>
+                <p>{{ m.market.name }}</p>
+                <h3>Market Description</h3>
+                <p>{{ m.market.description }}</p>
+                <button class="table-button sell-button" onclick="hideInfo({{m.market.id}})">Close</button>
+            </div>
+            <script>
+                setInterval(()=>updMarketCountdownLuxon('{{ m.market.id }}','{{ m.market.opening_date|date:"d F o" }}','{{ m.market.opening_time|time:"H:i:s" }}','{{ m.market.closing_date|date:"d F o" }}','{{ m.market.closing_time|time:"H:i:s" }}'),1000);
+                google.charts.load('current', {packages: ['corechart', 'line']});
+                google.charts.setOnLoadCallback(function() {chartDataTransform({{ m.market.id }}, {{ m.price_history }})});
+            </script>
+        {% endfor %}
+        <script>
+            setInterval(()=>marketSchedule(),600000);
+            window.onLoad=setSlidingMarketNames();
+            window.onLoad=setUpdatePricesRepeat();
+        </script>
+    {% else %}
+      <div class="central-message">
+        No Markets Found
+      </div>
+      <div class="central-submessage">
+      </div>
+    {% endif %}
+
+{% endblock markets %}
